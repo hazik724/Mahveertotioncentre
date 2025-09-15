@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import axios from "axios";
+import api from "@/lib/api";
 import {
   Dialog,
   DialogContent,
@@ -37,24 +37,20 @@ export default function JobBoardClient({ jobs }: Props) {
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  ) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async () => {
     try {
-      await axios.post("http://localhost:4000/applications", {
-        ...formData,
-      });
+      await api.post("/applications", { ...formData });
       setSuccess(true);
       setTimeout(() => {
         setSuccess(false);
         setOpen(false);
       }, 2000);
       setFormData({ name: "", email: "", phone: "", qualification: "" });
-    } catch (err) {
-      console.error(err);
-      alert("Something went wrong ❌");
+    } catch (err: any) {
+      console.error("Application submission error:", err.response || err);
+      alert(err.response?.data?.message || "Something went wrong ❌");
     }
   };
 
@@ -69,20 +65,14 @@ export default function JobBoardClient({ jobs }: Props) {
           transition={{ duration: 0.5, delay: index * 0.1 }}
           className="relative bg-white border border-red-100 rounded-2xl shadow-lg overflow-hidden group"
         >
-          {/* 🔴 Top Accent Bar */}
           <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-600 to-red-400"></div>
 
-          {/* 🔹 Card Content */}
           <div className="p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-red-600 transition-colors">
               {job.title}
             </h2>
+            <p className="text-gray-600 text-sm mb-4 line-clamp-3">{job.desc}</p>
 
-            <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-              {job.desc}
-            </p>
-
-            {/* Apply Button */}
             <Dialog open={open && selectedJob?.id === job.id} onOpenChange={setOpen}>
               <DialogTrigger asChild>
                 <Button
@@ -92,6 +82,7 @@ export default function JobBoardClient({ jobs }: Props) {
                   Apply Now
                 </Button>
               </DialogTrigger>
+
               <DialogContent className="sm:max-w-lg rounded-2xl shadow-2xl p-6">
                 <DialogHeader>
                   <DialogTitle className="text-2xl font-bold text-red-600 mb-2">
@@ -108,7 +99,6 @@ export default function JobBoardClient({ jobs }: Props) {
                     placeholder="Your Full Name"
                     value={formData.name}
                     onChange={handleChange}
-                    className="rounded-lg border-gray-300 focus:border-red-500 focus:ring-red-500"
                   />
                   <Input
                     name="email"
@@ -116,21 +106,18 @@ export default function JobBoardClient({ jobs }: Props) {
                     placeholder="Your Email Address"
                     value={formData.email}
                     onChange={handleChange}
-                    className="rounded-lg border-gray-300 focus:border-red-500 focus:ring-red-500"
                   />
                   <Input
                     name="phone"
                     placeholder="Phone (optional)"
                     value={formData.phone}
                     onChange={handleChange}
-                    className="rounded-lg border-gray-300 focus:border-red-500 focus:ring-red-500"
                   />
                   <Textarea
                     name="qualification"
                     placeholder="Your Qualifications"
                     value={formData.qualification}
                     onChange={handleChange}
-                    className="rounded-lg border-gray-300 focus:border-red-500 focus:ring-red-500"
                   />
 
                   <Button
@@ -141,7 +128,6 @@ export default function JobBoardClient({ jobs }: Props) {
                   </Button>
                 </div>
 
-                {/* ✅ Success animation */}
                 <AnimatePresence>
                   {success && (
                     <motion.div
@@ -151,24 +137,17 @@ export default function JobBoardClient({ jobs }: Props) {
                       transition={{ duration: 0.4 }}
                       className="flex flex-col items-center justify-center p-6"
                     >
-                      <motion.div
-                        initial={{ pathLength: 0 }}
-                        animate={{ pathLength: 1 }}
-                        transition={{ duration: 0.6 }}
-                        className="w-16 h-16 mb-3"
+                      <svg
+                        viewBox="0 0 24 24"
+                        className="w-16 h-16 mb-3 text-green-500"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                       >
-                        <svg
-                          viewBox="0 0 24 24"
-                          className="w-16 h-16 text-green-500"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M20 6L9 17l-5-5" />
-                        </svg>
-                      </motion.div>
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
                       <p className="text-green-600 font-semibold text-lg">
                         Application Sent!
                       </p>

@@ -2,7 +2,7 @@
 import axios from "axios"
 
 const api = axios.create({
-  baseURL: "http://localhost:4000", // 👈 change if your NestJS runs on another port
+  baseURL: process.env.NEXT_PUBLIC_API_URL  , // ✅ uses env variable
   headers: {
     "Content-Type": "application/json",
   },

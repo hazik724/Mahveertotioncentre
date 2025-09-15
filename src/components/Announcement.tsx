@@ -11,7 +11,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "@/lib/api";
+import { toast } from "react-hot-toast"; // ✅ toast for errors
 
 type Announcement = {
   id: number;
@@ -28,19 +29,30 @@ export default function AnnouncementDialog() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true; // ✅ avoid setting state after unmount
+
     const fetchLatest = async () => {
       try {
-        const res = await axios.get("http://localhost:4000/announcements/latest"); 
-        setLatest(res.data);
-        console.log(res.data)
+        console.log("👉 NEXT_PUBLIC_API_URL =", process.env.NEXT_PUBLIC_API_URL);
+
+        const res = await api.get("/announcements/latest");
+        if (isMounted) {
+          setLatest(res.data);
+        }
+        console.log("👉 Latest announcement:", res.data);
       } catch (error) {
-        console.error("Error fetching latest announcement:", error);
+        console.error("❌ Error fetching latest announcement:", error);
+        toast.error("Failed to load announcements.");
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
     fetchLatest();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (
@@ -61,8 +73,9 @@ export default function AnnouncementDialog() {
               <DialogTitle>Latest Announcement</DialogTitle>
             </DialogHeader>
 
+            {/* ✅ Loading / Data / Empty */}
             {loading ? (
-              <p className="text-gray-500">Loading...</p>
+              <p className="text-gray-500">⏳ Loading...</p>
             ) : latest ? (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -81,6 +94,7 @@ export default function AnnouncementDialog() {
               <p className="text-gray-500">No announcements available.</p>
             )}
 
+            {/* ✅ Link to all announcements */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -92,7 +106,7 @@ export default function AnnouncementDialog() {
                 onClick={() => {
                   setOpen(false);
                   setTimeout(() => {
-                    router.push("/announncement"); // full announcements page
+                    router.push("/announcements");
                   }, 300);
                 }}
               >

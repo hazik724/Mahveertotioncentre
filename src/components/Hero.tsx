@@ -1,6 +1,5 @@
 "use client"
 
-import Link from "next/link"
 import Image from "next/image"
 import { motion, useScroll, useTransform, Transition } from "framer-motion"
 import { useRef } from "react"

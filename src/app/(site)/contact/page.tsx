@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { toast } from "react-hot-toast"; // ✅ npm i react-hot-toast
+import api from "@/lib/api"; // ✅ our Axios helper
 
 const Contact = () => {
   const [form, setForm] = useState({
@@ -27,15 +28,11 @@ const Contact = () => {
 
     try {
       toast.loading("⏳ Sending message...");
-      const res = await fetch("http://localhost:4000/contacts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+      const res = await api.post("/contacts", form); // ✅ uses api.ts
 
       toast.dismiss(); // remove loading
 
-      if (res.ok) {
+      if (res.status === 201 || res.status === 200) {
         toast.success("🎉 Message sent successfully!");
         setForm({ name: "", email: "", phone: "", message: "" });
       } else {

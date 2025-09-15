@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import HeroReviews from "@/components/HeroReviews";
 import ReviewsSection from "@/components/ReviewsSection";
+import api from "@/lib/api"; // ✅ use your api.ts helper
 
 // ✅ SEO Metadata
 export const metadata: Metadata = {
@@ -44,10 +45,9 @@ export const metadata: Metadata = {
 
 // ✅ Reviews Page
 export default async function ReviewsPage() {
-  const res = await fetch("http://localhost:4000/reviews", {
-    cache: "no-store", // ✅ always fresh data
-  });
-  const reviews = await res.json();
+  // Use api.ts helper instead of hardcoded URL
+  const res = await api.get("/reviews"); // ✅ automatically uses NEXT_PUBLIC_API_URL
+  const reviews = res.data;
 
   // ✅ Build JSON-LD Schema
   const aggregateRating = {
