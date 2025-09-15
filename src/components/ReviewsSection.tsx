@@ -1,54 +1,49 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import axios from "axios"
-import { motion } from "framer-motion"
-import { toast } from "react-hot-toast"
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { toast } from "react-hot-toast";
+import api from "@/lib/api"; // ✅ use centralized axios instance
 
 type Review = {
-  id: number
-  name: string
-  message: string
-  createdAt: string
-}
+  id: number;
+  name: string;
+  message: string;
+  createdAt: string;
+};
 
 export default function ReviewsSection({ initialReviews }: { initialReviews: Review[] }) {
-  // ✅ Sort reviews by latest first
   const [reviews, setReviews] = useState<Review[]>(
     [...initialReviews].sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     )
-  )
+  );
 
-  const [name, setName] = useState("")
-  const [message, setMessage] = useState("")
+  const [name, setName] = useState("");
+  const [message, setMessage] = useState("");
 
-  // Handle form submit
+  // ✅ Handle form submit with api.ts
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!name || !message) {
-      toast.error("Please fill in all fields")
-      return
+      toast.error("Please fill in all fields");
+      return;
     }
 
     try {
-      const res = await axios.post("http://localhost:4000/reviews", {
-        name,
-        message,
-      })
+      const res = await api.post<Review>("/reviews", { name, message });
 
-      // ✅ Insert new review at the top
-      setReviews([res.data, ...reviews])
-      setName("")
-      setMessage("")
+      // Insert new review at the top
+      setReviews([res.data, ...reviews]);
+      setName("");
+      setMessage("");
 
-      toast.success("🎉 Review submitted successfully!")
+      toast.success("🎉 Review submitted successfully!");
     } catch (err) {
-      console.error("Error submitting review:", err)
-      toast.error("❌ Failed to submit review")
+      toast.error("❌ Failed to submit review");
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center py-12 px-4">
@@ -124,5 +119,5 @@ export default function ReviewsSection({ initialReviews }: { initialReviews: Rev
         )}
       </div>
     </div>
-  )
+  );
 }
