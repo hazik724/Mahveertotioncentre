@@ -46,8 +46,11 @@ export const metadata: Metadata = {
 // ✅ Reviews Page
 export default async function ReviewsPage() {
   // Use api.ts helper instead of hardcoded URL
-  const res = await api.get("/reviews"); // ✅ automatically uses NEXT_PUBLIC_API_URL
-  const reviews = res.data;
+ const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reviews`, {
+    cache: "no-store",        // 🚀 no caching
+    next: { revalidate: 0 },  // 🚀 disable ISR
+  });
+   const reviews = await res.json();
 
   // ✅ Build JSON-LD Schema
   const aggregateRating = {
