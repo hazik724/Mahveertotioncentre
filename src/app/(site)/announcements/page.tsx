@@ -1,25 +1,32 @@
-import type { Metadata } from "next";
-import api from "@/lib/api"; // ✅ centralized axios
+import type { Metadata } from "next"
 
 type Announcement = {
-  id: number;
-  title: string;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-};
+  id: number
+  title: string
+  content: string
+  createdAt: string
+  updatedAt: string
+}
 
 export const metadata: Metadata = {
   title: "Announcements | My School",
   description: "Stay updated with the latest announcements from our school.",
-};
+}
 
 export default async function AnnouncementsPage() {
-  let announcements: Announcement[] = [];
+  let announcements: Announcement[] = []
 
   try {
-    const res = await api.get<Announcement[]>("/announcements");
-    announcements = res.data;
+    // ✅ Use fetch instead of axios for SSR
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/announcements`, {
+      cache: "no-store", // ✅ Always fresh data
+    })
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch: ${res.status}`)
+    }
+
+    announcements = await res.json()
   } catch {
     // ✅ Fail silently and show UI message
     return (
@@ -28,7 +35,7 @@ export default async function AnnouncementsPage() {
           🚨 Failed to load announcements. Please try again later.
         </p>
       </div>
-    );
+    )
   }
 
   return (
@@ -64,5 +71,5 @@ export default async function AnnouncementsPage() {
         )}
       </div>
     </div>
-  );
+  )
 }

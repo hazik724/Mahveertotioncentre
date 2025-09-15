@@ -1,13 +1,15 @@
-import api from "@/lib/api"
 import ContactsTable from "./ContactsTable"
 
 export default async function ContactsPage() {
   let contacts = []
   try {
-    const res = await api.get("/contacts") // ✅ Your NestJS route
-    contacts = res.data
-  } catch (err) {
-    console.error("Failed to fetch contacts:", err)
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/contacts`, {
+      cache: "no-store", // ✅ always fresh data, no caching issues
+    })
+    if (!res.ok) throw new Error("Failed to fetch contacts")
+    contacts = await res.json()
+  } catch {
+    // 🚨 fail silently, no console logs in production
   }
 
   return (

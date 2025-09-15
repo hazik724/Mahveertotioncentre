@@ -1,13 +1,21 @@
-import api from "@/lib/api"
 import ApplicationsTable from "./ApplicationsTable"
 
 export default async function ApplicationsPage() {
-  let applications = []
+  let applications: any[] = []
+
   try {
-    const res = await api.get("/applications") // ✅ Your NestJS route
-    applications = res.data
+    // ✅ Use native fetch for server-side
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/applications`, {
+      cache: "no-store", // ✅ always fetch fresh data
+    })
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch applications: ${res.status}`)
+    }
+
+    applications = await res.json()
   } catch (err) {
-    console.error("Failed to fetch applications:", err)
+    console.error("❌ Failed to fetch applications (SSR):", err)
   }
 
   return (
