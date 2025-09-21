@@ -6,7 +6,7 @@ import Image from "next/image"
 export default function Hero() {
   return (
     <section>
-      <div className="relative py-12 bg-gray-900 sm:py-16 lg:py-20 xl:pt-32 xl:pb-44 overflow-hidden rounded-lg">
+      <div className="relative py-12 bg-red-600 sm:py-16 lg:py-20 xl:pt-32 xl:pb-44 overflow-hidden rounded-lg">
         {/* Background Image for desktop */}
         <motion.div
   initial={{ opacity: 0 }}
@@ -81,7 +81,7 @@ Where Curiosity Meets Excellence in Every Classroom.”
               <motion.a
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center justify-center px-3 py-3 text-base font-bold leading-7 text-white transition-all duration-300 bg-red-600 rounded-md shadow-md sm:px-6 hover:bg-red-400  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white focus:ring-offset-gray-900"
+                className="inline-flex items-center justify-center px-3 py-3 text-base font-bold leading-7 text-red-600 transition-all duration-300 bg-white rounded-md shadow-md sm:px-6 hover:bg-gray-700  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white focus:ring-offset-gray-900"
               >
                 MDCAT
               </motion.a>

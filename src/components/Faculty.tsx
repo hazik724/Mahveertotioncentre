@@ -1,6 +1,7 @@
 "use client";
+
 import { motion } from "framer-motion";
-import Image from "next/image"; // ✅ import next/image
+import Image from "next/image";
 
 type TeamMember = {
   name: string;
@@ -18,44 +19,53 @@ const team: TeamMember[] = [
 
 export default function TeamSection() {
   return (
-    <section className="py-16 bg-white overflow-hidden">
-      <h2 className="text-4xl font-bold text-center mb-20">
+    <section className="py-20 bg-white relative overflow-hidden">
+      <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-16">
         Meet Our <span className="text-red-600">Faculty</span>
       </h2>
 
-      <div className="relative w-full">
+      <div className="relative w-full overflow-hidden">
         <motion.div
-          className="flex space-x-6"
-          animate={{ x: ["0%", "-50%"] }}
+          className="flex gap-6"
+          animate={{ x: ["0%", "-100%"] }}
           transition={{
             repeat: Infinity,
-            duration: 20,
+            duration: 30,
             ease: "linear",
           }}
         >
-          {/* Duplicate array for infinite loop */}
           {[...team, ...team].map((member, index) => (
-            <div
+            <motion.div
               key={index}
-              className="relative min-w-[220px] h-[300px] rounded-2xl overflow-hidden shadow-lg cursor-pointer group"
+              whileHover={{ scale: 1.05, rotateY: 2 }}
+              className="relative min-w-[250px] h-[340px] rounded-3xl overflow-hidden shadow-2xl bg-white/10 backdrop-blur-lg border border-white/30 cursor-pointer group"
             >
-              {/* ✅ Replaced img with Next.js Image */}
+              {/* Faculty Image */}
               <Image
                 src={member.img}
                 alt={member.name}
                 fill
-                className="object-cover group-hover:scale-110 transition duration-500"
-                sizes="(max-width: 768px) 100vw, 220px" // responsive size hint
+                className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
               />
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition duration-500 flex flex-col items-center justify-center text-white">
-                <h3 className="text-xl font-semibold">{member.name}</h3>
-                <p className="text-sm">{member.role}</p>
-              </div>
-            </div>
+
+              {/* Overlay Info */}
+              <motion.div
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col items-center justify-end pb-6 text-center text-white"
+              >
+                <h3 className="text-lg md:text-xl font-bold">{member.name}</h3>
+                <p className="text-sm opacity-80">{member.role}</p>
+              </motion.div>
+            </motion.div>
           ))}
         </motion.div>
       </div>
+
+      {/* Glow effects */}
+      <div className="absolute w-[500px] h-[500px] bg-red-200 rounded-full blur-[200px] -top-40 -left-40 opacity-30"></div>
+      <div className="absolute w-[400px] h-[400px] bg-rose-400 rounded-full blur-[200px] -bottom-40 -right-40 opacity-30"></div>
     </section>
   );
 }
-

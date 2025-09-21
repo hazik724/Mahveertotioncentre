@@ -1,18 +1,21 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import api from "@/lib/api";
-
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { motion } from "framer-motion"
+import api from "@/lib/api"
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-
-import { Megaphone, FileText, Star, Mail } from "lucide-react";
-
+} from "@/components/ui/card"
+import {
+  Megaphone,
+  FileText,
+  Star,
+  Mail,
+} from "lucide-react"
 import {
   ResponsiveContainer,
   BarChart,
@@ -21,80 +24,83 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
-} from "recharts";
+} from "recharts"
+import AdminGuard from "@/components/AdminGuard"
 
-// ---------------- Logout Button ----------------
-function LogoutButton() {
-  const handleLogout = async () => {
-    try {
-      await api.post("/auth/logout");
-      window.location.href = "/login"; // 👈 simpler than router.push
-    } catch (err) {
-      console.error("Logout failed:", err);
-    }
-  };
-
-  return (
-    <button
-      onClick={handleLogout}
-      className="px-4 py-2 bg-gradient-to-r from-red-600 to-rose-600 text-white rounded-xl shadow-md hover:scale-105 transition"
-    >
-      Logout
-    </button>
-  );
-}
-
-// ---------------- Dashboard Page ----------------
 export default function DashboardPage() {
+  const router = useRouter()
   const [stats, setStats] = useState({
     announcements: 0,
     applications: 0,
     reviews: 0,
     contacts: 0,
-  });
-  const [applicationsData, setApplicationsData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  })
+  const [applicationsData, setApplicationsData] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    async function fetchStats() {
+    async function fetchData() {
       try {
+        // 🔑 Check if admin is logged in
+        const me = await api.get("/auth/me")
+        if (!me.data || me.data.role !== "admin") {
+          router.push("/login")
+          return
+        }
+
+        // 📊 Fetch dashboard stats
         const [ann, apps, revs, cons] = await Promise.all([
           api.get("/announcements"),
           api.get("/applications"),
           api.get("/reviews"),
           api.get("/contacts"),
-        ]);
+        ])
 
         setStats({
           announcements: ann.data.length,
           applications: apps.data.length,
           reviews: revs.data.length,
           contacts: cons.data.length,
-        });
+        })
 
-        // Group applications per month
+        // 📈 Group applications per month
         const grouped = apps.data.reduce((acc: any, app: any) => {
-          const month = new Date(app.createdAt).toLocaleString("default", {
-            month: "short",
-          });
-          acc[month] = (acc[month] || 0) + 1;
-          return acc;
-        }, {});
+          const month = new Date(app.createdAt).toLocaleString("default", { month: "short" })
+          acc[month] = (acc[month] || 0) + 1
+          return acc
+        }, {})
 
         setApplicationsData(
           Object.entries(grouped).map(([month, count]) => ({
             month,
             count,
           }))
-        );
+        )
       } catch (err) {
-        console.error("Failed to fetch stats:", err);
+        console.error("Failed to load dashboard:", err)
+        router.push("/login") // fallback
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     }
-    fetchStats();
-  }, []);
+
+    fetchData()
+  }, [router])
+
+  // 🌟 Spinner while loading
+  if (loading) {
+    return (
+  
+
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-white via-red-50 to-rose-100">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+          className="w-16 h-16 border-4 border-red-500 border-t-transparent rounded-full shadow-lg"
+          />
+      </div>
+    )
+  }
 
   const cards = [
     {
@@ -121,34 +127,19 @@ export default function DashboardPage() {
       icon: <Mail className="w-10 h-10 text-white" />,
       gradient: "from-rose-500 to-red-700",
     },
-  ];
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-white via-red-50 to-rose-100">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-          className="w-16 h-16 border-4 border-red-500 border-t-transparent rounded-full shadow-lg"
-        />
-      </div>
-    );
-  }
+  ]
 
   return (
     <div className="p-10 min-h-screen bg-gradient-to-br from-white via-red-50 to-rose-100">
-      {/* Header with Logout */}
-      <div className="flex justify-between items-center mb-10">
-        <motion.h1
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          className="text-5xl font-extrabold bg-gradient-to-r from-red-600 via-rose-500 to-orange-400 text-transparent bg-clip-text drop-shadow-lg"
-        >
-          Dashboard Analytics
-        </motion.h1>
-        <LogoutButton />
-      </div>
+      {/* Heading */}
+      <motion.h1
+        initial={{ opacity: 0, y: -30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7 }}
+        className="text-5xl font-extrabold mb-12 bg-gradient-to-r from-red-600 via-rose-500 to-orange-400 text-transparent bg-clip-text text-center drop-shadow-lg"
+      >
+        Dashboard Analytics
+      </motion.h1>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
@@ -160,9 +151,7 @@ export default function DashboardPage() {
             transition={{ delay: i * 0.2, duration: 0.6 }}
           >
             <Card className="rounded-3xl shadow-2xl border-0 bg-white/40 backdrop-blur-xl overflow-hidden hover:scale-105 transition-transform">
-              <div
-                className={`bg-gradient-to-r ${card.gradient} p-6 flex items-center justify-center`}
-              >
+              <div className={`bg-gradient-to-r ${card.gradient} p-6 flex items-center justify-center`}>
                 {card.icon}
               </div>
               <CardHeader>
@@ -171,7 +160,9 @@ export default function DashboardPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-5xl font-extrabold text-gray-900">{card.value}</p>
+                <p className="text-5xl font-extrabold text-gray-900">
+                  {card.value}
+                </p>
               </CardContent>
             </Card>
           </motion.div>
@@ -210,5 +201,5 @@ export default function DashboardPage() {
         </Card>
       </motion.div>
     </div>
-  );
+  )
 }

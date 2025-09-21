@@ -2,13 +2,14 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu, X, LayoutDashboard, Megaphone, FileText, Star, Mail } from "lucide-react"
+import { Menu, X, LayoutDashboard, Megaphone, FileText, Briefcase,Star, Mail } from "lucide-react"
 import { useState } from "react"
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
   { name: "Announcements", href: "/dashboard/announcements", icon: <Megaphone className="w-5 h-5" /> },
   { name: "Applications", href: "/dashboard/applications", icon: <FileText className="w-5 h-5" /> },
+  { name: "Jobs", href: "/dashboard/jobs", icon: <Briefcase className="w-5 h-5" /> },
   { name: "Reviews", href: "/dashboard/reviews", icon: <Star className="w-5 h-5" /> },
   { name: "Contacts", href: "/dashboard/contacts", icon: <Mail className="w-5 h-5" /> },
 ]
