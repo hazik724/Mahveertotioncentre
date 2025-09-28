@@ -58,7 +58,7 @@ export default function Hero() {
               transition={{ duration: 0.8 }}
               className="text-3xl font-bold text-white sm:text-4xl xl:text-5xl xl:leading-tight"
             >
-              Mahveer Tuition Center
+              MTC School
             </motion.h1>
 
             {/* Paragraph */}
@@ -79,7 +79,7 @@ Where Curiosity Meets Excellence in Every Classroom.”
   className="flex items-center justify-center mt-8 xl:mt-16 lg:justify-start"
 >
   <motion.a
-    href="/school/about"
+    href="/"
     whileHover={{
       scale: 1.1,
       boxShadow: "0 0 25px rgba(255,255,255,0.9), 0 0 50px rgba(220,38,38,0.8)",
@@ -93,7 +93,7 @@ Where Curiosity Meets Excellence in Every Classroom.”
       animate={{ x: ["-100%", "100%"] }}
       transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
     />
-    <span className="relative z-10">Explore School</span>
+    <span className="relative z-10">Explore Tiution</span>
   </motion.a>
 </motion.div>
 

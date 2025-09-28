@@ -1,11 +1,11 @@
 "use client"
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Menu, X, LayoutDashboard, Megaphone, FileText, Briefcase,Star, Mail } from "lucide-react"
 import { useState } from "react"
+import { usePathname } from "next/navigation"
+import { Menu, X, LayoutDashboard, Megaphone, FileText, Briefcase, Star, Mail } from "lucide-react"
+import NavSection from "./NavSection"
 
-const navItems = [
+const tuitionNavItems = [
   { name: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
   { name: "Announcements", href: "/dashboard/announcements", icon: <Megaphone className="w-5 h-5" /> },
   { name: "Applications", href: "/dashboard/applications", icon: <FileText className="w-5 h-5" /> },
@@ -14,12 +14,34 @@ const navItems = [
   { name: "Contacts", href: "/dashboard/contacts", icon: <Mail className="w-5 h-5" /> },
 ]
 
+const schoolNavItems = [
+  { name: "School Announcements", href: "/dashboard/school/announcements", icon: <Megaphone className="w-5 h-5" /> },
+  { name: "School Reviews", href: "/dashboard/school/reviews", icon: <Star className="w-5 h-5" /> },
+  { name: "School Gallery", href: "/dashboard/school/gallery", icon: <FileText className="w-5 h-5" /> },
+]
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
+  // Dynamic topbar title based on pathname
+  const topbarTitle = (() => {
+    if (pathname.startsWith("/dashboard/school")) {
+      if (pathname.includes("announcements")) return "School Announcements"
+      if (pathname.includes("reviews")) return "School Reviews"
+      if (pathname.includes("gallery")) return "School Gallery"
+      return "School Dashboard"
+    } else {
+      if (pathname.includes("announcements")) return "Tuition Announcements"
+      if (pathname.includes("applications")) return "Applications"
+      if (pathname.includes("jobs")) return "Jobs"
+      if (pathname.includes("reviews")) return "Reviews"
+      if (pathname.includes("contacts")) return "Contacts"
+      return "Tuition Dashboard"
+    }
+  })()
+
   return (
-    
     <div className="flex min-h-screen bg-gradient-to-br from-white via-red-50 to-rose-100">
       {/* Sidebar */}
       <div
@@ -33,23 +55,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </h2>
         </div>
         <nav className="px-4 space-y-2">
-          {navItems.map((item) => {
-            const active = pathname === item.href
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition ${
-                  active
-                    ? "bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-lg"
-                    : "text-gray-700 hover:bg-red-50 hover:text-red-600"
-                }`}
-              >
-                {item.icon}
-                {item.name}
-              </Link>
-            )
-          })}
+          <NavSection title="Tuition" items={tuitionNavItems} />
+          <NavSection title="School" items={schoolNavItems} />
         </nav>
       </div>
 
@@ -63,7 +70,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           >
             {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
-          <h1 className="text-xl font-bold text-gray-800">School Admin Dashboard</h1>
+          <h1 className="text-xl font-bold text-gray-800">{topbarTitle}</h1>
           <div className="text-sm text-gray-500">Admin</div>
         </header>
 
